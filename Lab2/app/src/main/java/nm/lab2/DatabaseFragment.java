@@ -39,16 +39,13 @@ public class DatabaseFragment extends Fragment {
         previous.setOnClickListener(new PreviousListener());
         Button delete = (Button) rootView.findViewById(R.id.delete_button);
         delete.setOnClickListener(new DeleteListener());
-
-        Log.d("get saved images", "start");
-        getSavedImages();
-
         webView = (WebView) rootView.findViewById(R.id.database_web_view);
-        //put first image in webView
-        Log.d("check in", "working fine");
+
+        //retrieve from database
+        getSavedImages();
+        //put first image in webView if it exists
         if (num_images != 0){
             webView.loadUrl(images.get(0));
-            Log.d("webview working","good");
         } else{
             Toast.makeText(getActivity().getBaseContext(), "No images have been saved",
                     Toast.LENGTH_LONG).show();
@@ -57,10 +54,11 @@ public class DatabaseFragment extends Fragment {
         return rootView;
     }
 
+    //get images from database and save them into arraylist "images"
     public void getSavedImages() {
-        //get images from database and save them into arraylist "images"
-        mDbHelper = new FeedReaderDbHelper(getActivity().getBaseContext()); //initialize database
+        mDbHelper = new FeedReaderDbHelper(getActivity()); //initialize database
         images = mDbHelper.readDatabase();
+        num_images = images.size();
     }
 
     //change back to search fragment
@@ -84,7 +82,7 @@ public class DatabaseFragment extends Fragment {
             }else{
                 //if looking at last image
                 Toast.makeText(getActivity().getBaseContext(), "No more images to view",
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -95,7 +93,7 @@ public class DatabaseFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if(current_image > 0){
-                //if there are still images
+                //if you aren't on the first image
                 current_image -= 1;
                 webView.loadUrl(images.get(current_image));
             }else{
@@ -106,11 +104,28 @@ public class DatabaseFragment extends Fragment {
         }
     }
 
+    //listener to delete images from feed
     private class DeleteListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            //mDbHelper = new FeedReaderDbHelper(getActivity().getBaseContext()); //initialize database
-            mDbHelper.deleteDatabase(images.get(current_image));
+            if (num_images == 0) { //if there are no images in feed
+                Toast.makeText(getActivity().getBaseContext(), "No images to delete",
+                        Toast.LENGTH_SHORT).show();
+            }else{
+                mDbHelper.deleteDatabase(images.get(current_image));
+
+                //update webview by making sure you aren't viewing the deleted image
+                getSavedImages();
+                if (current_image != 0) {
+                    //change image view to previous image
+                    current_image -= 1;
+                    webView.loadUrl(images.get(current_image));
+                }else{
+                    //if there are no images left in feed, show nothing
+                    webView.loadUrl("about:blank");
+                }
+
+            }
         }
     }
 }

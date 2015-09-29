@@ -16,11 +16,10 @@ public final class FeedReaderContract{
         public static final String URL_COLUMN= "url";
         public static final String URL_ID= "_id";
 
-        //private static final String COMMA_SEP = ",";
         public static final String SQL_CREATE_ENTRIES =
                 "CREATE TABLE " + FeedEntry.TABLE_NAME + " (" +
-                        FeedEntry.URL_ID + "INTEGER PRIMARY KEY, " +
-                        FeedEntry.URL_COLUMN + "TEXT )";
+                        FeedEntry.URL_ID + " INTEGER PRIMARY KEY," +
+                        FeedEntry.URL_COLUMN + " TEXT )";
 
         public static final String SQL_DELETE_ENTRIES =
                 "DROP TABLE IF EXISTS " + FeedEntry.TABLE_NAME;

@@ -17,7 +17,7 @@ import nm.lab2.FeedReaderContract.FeedEntry;
  */
 public class FeedReaderDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "FeedReader.db";
 
     public FeedReaderDbHelper(Context context) {
@@ -51,10 +51,10 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
 
         dbwrite.insertOrThrow(
                 FeedEntry.TABLE_NAME,
-               null, // FeedEntry.URL_COLUMN,
+                null, // FeedEntry.URL_COLUMN,
                 values);
         Log.d("Wrote to database:", FeedEntry.TABLE_NAME + "-----" + FeedEntry.URL_COLUMN + "---" + input);
-        dbwrite.close();
+        //dbwrite.close();
     }
 
     //deletes image from database
@@ -78,8 +78,6 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
                 FeedEntry.URL_ID,
                 FeedEntry.URL_COLUMN};
 
-        //Cursor c = dbread.rawQuery("SELECT * FROM " + FeedEntry.TABLE_NAME, null);
-
         Cursor c = dbread.query(
                 FeedEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
@@ -93,11 +91,11 @@ public class FeedReaderDbHelper extends SQLiteOpenHelper {
         c.moveToFirst();
         while (!c.isAfterLast()){
             imageURLs.add(c.getString(1));
-            Log.d("added 1 image", c.getString(1));
+            Log.d("read 1 image", c.getString(1));
             c.moveToNext();
         }
-        c.close();
-        dbread.close();
+        //c.close();    <--- is this necessary?
+        //dbread.close();
         return imageURLs;
     }
 }

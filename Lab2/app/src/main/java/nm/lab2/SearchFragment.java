@@ -49,37 +49,8 @@ public class SearchFragment extends Fragment {
         Button add = (Button) rootView.findViewById(R.id.add_button);
         add.setOnClickListener(new addListener());
 
-        //long click listener for adding to feed - IGNORE, for some reason crashes app, use button instead
-        /*
-        webView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //alert dialog
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity().getBaseContext());
-                alertDialogBuilder.setMessage("Add this to your feed?");
+        //NOTE: wrote long click listener for adding to feed - for some reason crashes app, use button instead
 
-                //alert buttons
-                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //ADD TO DATABASE
-
-                        //code here
-
-                        ///ADD TO DATABASE
-                        Toast.makeText(getActivity().getBaseContext(), "Added to feed", Toast.LENGTH_LONG).show();
-                    }
-                });
-                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog2, int which2) {}//do nothing
-                });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-                return false;
-            }
-        });
-        */
         return rootView;
     }
 
@@ -93,16 +64,15 @@ public class SearchFragment extends Fragment {
             EditText searchBar = (EditText) rootView.findViewById(R.id.search_bar);
             webView = (WebView) rootView.findViewById(R.id.webView); //where what you searched for will appear!
             String searchQuery = searchBar.getText().toString(); //what you searched for!
-            //if something is put into the search bar...
-            if (searchQuery.length() != 0) {
+            //if something is put into the search bar and it's not empty...
+            if (searchQuery.length() != 0) { //NOTE: should change to make sure you don't put any & symbols and replace spaces with %20/something
                 //do HTTP request
                 searchGoogle(webView, searchQuery);
             }
         }
 
-
+        //method to make your search query and search google for images
         public void searchGoogle(final WebView webView, String searchQuery) {
-
             HTTPHandler handler = new HTTPHandler(getActivity().getBaseContext());
             handler.searchWithCallback(searchQuery, new SuccessCallback() {
                 @Override
@@ -152,7 +122,7 @@ public class SearchFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if(current_image > 0){
-                //if there are still images
+                //if you're not at the first image
                 current_image -= 1;
                 webView.loadUrl(images.get(current_image));
             }else{
@@ -163,7 +133,7 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    //checks to make sure image link doesn't force you to open new window
+    //checks to make sure image link doesn't force you to open new window and redirect
     public void checkRedirect(String url){
         if (url.contains("?attredirects=0")){
             String new_url = url.replaceAll("\\battredirects=0\\b", "");
@@ -171,7 +141,7 @@ public class SearchFragment extends Fragment {
         }
     }
 
-    //class to change fragment
+    //class to change fragment to database fragment
     public class DatabaseListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -186,9 +156,11 @@ public class SearchFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (images.isEmpty()) {
+                //if there are no images searched for and you click add
                 Toast.makeText(getActivity().getBaseContext(), "Search for images first",
                         Toast.LENGTH_SHORT).show();
             } else {
+                //otherwise, write to feed
                 mDbHelper = new FeedReaderDbHelper(getActivity().getBaseContext()); //initialize database
                 mDbHelper.writeDatabase(images.get(current_image));
             }
